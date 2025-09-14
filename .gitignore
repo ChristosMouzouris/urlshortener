@@ -49,5 +49,8 @@ Thumbs.db
 /dist/
 /build/  # React production build (you don’t commit this, it’s generated)
 
+# Docker volumes
+/db_data/
+
 # Env
 .env

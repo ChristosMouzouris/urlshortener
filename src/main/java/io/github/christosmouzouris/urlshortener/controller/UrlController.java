@@ -29,10 +29,16 @@ public class UrlController {
     }
 
     @GetMapping("/{shortUrl}")
-    public UrlResponseDto getUrl(@PathVariable String shortUrl){
+    public UrlResponseDto getShortUrl(@PathVariable String shortUrl){
         Url entity = urlService.getUrlByShortUrl(shortUrl);
         return urlMapper.toResponseDto(entity);
     }
+
+//    @GetMapping("/{longUrl}")
+//    public UrlResponseDto getLongUrl(@PathVariable String longUrl){
+//        Url entity = urlService.getUrlByLongUrl(longUrl);
+//        return urlMapper.toResponseDto(entity);
+//    }
 
     @GetMapping
     public List<UrlResponseDto> getAllUrls() {

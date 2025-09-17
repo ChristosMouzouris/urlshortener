@@ -30,7 +30,7 @@ public class UrlController {
 
     @GetMapping("/{shortUrl}")
     public UrlResponseDto getShortUrl(@PathVariable String shortUrl){
-        Url entity = urlService.getUrlByShortUrl(shortUrl);
+        Url entity = urlService.accessUrl(shortUrl);
         return urlMapper.toResponseDto(entity);
     }
 

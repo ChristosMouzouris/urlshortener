@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service layer for managing shortened URLs
+ * Handles creation of new URLs, resolves existing ones and
+ * updates access metadata
+ */
 @Service
 public class UrlService {
 

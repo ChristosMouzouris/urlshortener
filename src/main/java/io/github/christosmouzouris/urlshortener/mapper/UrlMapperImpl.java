@@ -20,16 +20,16 @@ public class UrlMapperImpl implements UrlMapper {
     }
 
     @Override
-    public UrlResponseDto toResponseDto(Url entity) {
+    public UrlResponseDto toResponseDto(Url url) {
         return new UrlResponseDto(
-                entity.getShortUrl(),
-                entity.getLongUrl()
+                url.getShortUrl(),
+                url.getLongUrl()
         );
     }
 
     public List<UrlResponseDto> toResponseDtoList(List<Url> urls) {
         return urls.stream()
-                .map(url -> new UrlResponseDto(url.getShortUrl(), url.getLongUrl()))
+                .map(this::toResponseDto)
                 .collect(Collectors.toList());
     }
 }

@@ -2,6 +2,8 @@ package io.github.christosmouzouris.urlshortener.util;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.hashids.Hashids;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +14,8 @@ public class HashidsUtil {
 
     private static final int DEFAULT_MIN_LENGTH = 6;
     private static final long DEFAULT_OFFSET = 100_000L;
+
+    private static final Logger log = LoggerFactory.getLogger(HashidsUtil.class);
 
     public HashidsUtil() {
         Dotenv dotenv = Dotenv.load();
@@ -27,8 +31,7 @@ public class HashidsUtil {
             try {
                 minLength = Integer.parseInt(minLengthStr);
             } catch (NumberFormatException e) {
-                // LOG
-                System.out.println("Invalid HASHIDS_MIN_LENGTH, using default: " + DEFAULT_MIN_LENGTH);
+                log.warn("Unable to load HASHIDS_MIN_LENGTH from dotenv, using default: " + DEFAULT_MIN_LENGTH);
             }
         }
 
@@ -39,7 +42,7 @@ public class HashidsUtil {
                 idOffset = Long.parseLong(offsetStr);
             } catch (NumberFormatException e) {
                 // LOG
-                System.out.println("Invalid ID_OFFSET, using default: " + DEFAULT_OFFSET);
+                log.warn("Unable to load ID_OFFSET from dotenv, using default: " + DEFAULT_OFFSET);
             }
         }
 

@@ -2,6 +2,8 @@ package io.github.christosmouzouris.urlshortener.util;
 
 import io.github.christosmouzouris.urlshortener.model.ClientType;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
@@ -22,6 +24,8 @@ public class RequestInfoUtil {
 
     private final Parser uaParser;
     private final RestTemplate restTemplate;
+
+    private static final Logger log =  LoggerFactory.getLogger(RequestInfoUtil.class);
 
     public RequestInfoUtil(Parser uaParser,  RestTemplate restTemplate) {
         this.uaParser = uaParser;
@@ -89,7 +93,7 @@ public class RequestInfoUtil {
                     .map(m -> (Map<String, Object>) m)
                     .orElse(Collections.emptyMap());
         } catch (RestClientException e) {
-            // LOG
+            log.warn("Geolocation look up failed for IP {}: {}", ip, e.getMessage());
             geoRaw = Collections.emptyMap();
         }
 

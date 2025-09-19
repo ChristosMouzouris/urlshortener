@@ -76,9 +76,8 @@ public class UrlService {
     public Url accessUrl(String shortUrl) {
         Url url = urlRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new UrlNotFoundException(shortUrl));
-
         url.setLastAccessedDate(LocalDateTime.now());
-        // Update clicks
+
         return urlRepository.save(url);
     }
 

@@ -3,7 +3,9 @@ package io.github.christosmouzouris.urlshortener.controller;
 
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
 import io.github.christosmouzouris.urlshortener.model.Url;
+import io.github.christosmouzouris.urlshortener.service.AnalyticsService;
 import io.github.christosmouzouris.urlshortener.service.UrlService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,9 +18,11 @@ import java.net.URI;
 public class RedirectController {
 
     private final UrlService urlService;
+    private final AnalyticsService analyticsService;
 
-    public RedirectController(UrlService urlService) {
+    public RedirectController(UrlService urlService , AnalyticsService analyticsService) {
         this.urlService = urlService;
+        this.analyticsService = analyticsService;
     }
 
     /**
@@ -31,8 +35,9 @@ public class RedirectController {
      * @throws UrlNotFoundException if the short URL does not exist in the database
      */
     @GetMapping("/{shortUrl}")
-    public ResponseEntity<?> getUrl(@PathVariable String shortUrl){
+    public ResponseEntity<?> getUrl(@PathVariable String shortUrl, HttpServletRequest request) {
         Url entity = urlService.accessUrl(shortUrl);
+        analyticsService.handleClickEvent(entity, request);
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(entity.getLongUrl()))

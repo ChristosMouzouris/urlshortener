@@ -97,6 +97,7 @@ public class RequestInfoUtil {
             geoRaw = Collections.emptyMap();
         }
 
+        System.out.println("geoRaw: " + geoRaw);
 
         String countryCode = geoRaw.getOrDefault("country_code", "N/A").toString();
 

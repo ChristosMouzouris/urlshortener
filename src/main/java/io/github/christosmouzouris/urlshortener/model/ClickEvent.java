@@ -40,7 +40,7 @@ public class ClickEvent {
     @Column(nullable = false)
     private ClientType clientType;
 
-    @Column(name = "country_code", nullable = false, length = 2)
+    @Column(name = "country_code", nullable = false, length = 3)
     private String countryCode;
 
     @Column(columnDefinition = "jsonb")

@@ -30,7 +30,9 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
     List<ClickEvent> findByLocation(@Param("countryCode") String countryCode);
 
     @Query("SELECT COUNT(ce) AS count, ce.url.shortUrl as shortUrl " +
-            "FROM ClickEvent ce ORDER BY COUNT(ce) DESC " +
+            "FROM ClickEvent ce " +
+            "GROUP BY ce.url.shortUrl " +
+            "ORDER BY COUNT(ce) DESC " +
             "LIMIT :limit")
     List<TopUrlsProjection> findTopUrls(@Param("limit") int limit);
 

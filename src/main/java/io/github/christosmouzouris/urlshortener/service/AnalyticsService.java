@@ -4,8 +4,6 @@ import io.github.christosmouzouris.urlshortener.dto.ClicksByBrowserResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.ClicksByLocationResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.TopUrlsResponseDto;
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
-import io.github.christosmouzouris.urlshortener.mapper.ClicksByLocationProjection;
-import io.github.christosmouzouris.urlshortener.mapper.TopUrlsProjection;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.ClickEventRepository;
@@ -53,6 +51,7 @@ public class AnalyticsService {
         clickEvent.setClientType(requestInfoUtil.getClient(request));
 
         GeoResult geoResult = requestInfoUtil.getGeoResult(request);
+        System.out.println("The country code to be persisted" + geoResult.getCountryCode());
         clickEvent.setCountryCode(geoResult.getCountryCode());
         clickEvent.setLocationDetails(geoResult.getLocationDetails());
 
@@ -98,7 +97,7 @@ public class AnalyticsService {
      */
     public List<ClicksByLocationResponseDto> getTotalClicksByLocation() {
         return clickEventRepository.findTotalClicksByLocation().stream()
-                .map(ce -> new ClicksByLocationResponseDto(ce.getCount(), ce.getLocation()))
+                .map(ce -> new ClicksByLocationResponseDto(ce.getCount(), ce.getCountryCode()))
                 .toList();
     }
 
@@ -126,7 +125,7 @@ public class AnalyticsService {
      */
     public List<TopUrlsResponseDto> getTopUrls(int limit){
         return clickEventRepository.findTopUrls(limit).stream()
-                .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getUrls()))
+                .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getShortUrl()))
                 .toList();
     }
 }

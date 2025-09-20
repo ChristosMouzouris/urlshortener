@@ -30,6 +30,6 @@ public class UrlMapperImpl implements UrlMapper {
     public List<UrlResponseDto> toResponseDtoList(List<Url> urls) {
         return urls.stream()
                 .map(this::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

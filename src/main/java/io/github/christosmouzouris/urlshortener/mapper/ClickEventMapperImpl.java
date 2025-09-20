@@ -26,6 +26,6 @@ public class ClickEventMapperImpl implements ClickEventMapper {
     public List<ClickEventResponseDto> toResponseDtoList(List<ClickEvent> clickEvents) {
         return clickEvents.stream()
                 .map(this::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

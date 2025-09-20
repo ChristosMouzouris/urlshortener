@@ -16,8 +16,6 @@ public class UrlshortenerApplication {
         System.setProperty("POSTGRES_HOST", dotenv.get("POSTGRES_HOST"));
         System.setProperty("POSTGRES_PORT", dotenv.get("POSTGRES_PORT"));
 
-
         SpringApplication.run(UrlshortenerApplication.class, args);
     }
-
 }

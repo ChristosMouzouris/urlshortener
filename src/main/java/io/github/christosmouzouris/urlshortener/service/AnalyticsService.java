@@ -1,15 +1,22 @@
 package io.github.christosmouzouris.urlshortener.service;
 
+import io.github.christosmouzouris.urlshortener.dto.ClicksByBrowserResponseDto;
+import io.github.christosmouzouris.urlshortener.dto.ClicksByLocationResponseDto;
+import io.github.christosmouzouris.urlshortener.dto.TopUrlsResponseDto;
+import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
+import io.github.christosmouzouris.urlshortener.mapper.ClicksByLocationProjection;
+import io.github.christosmouzouris.urlshortener.mapper.TopUrlsProjection;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.ClickEventRepository;
+import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.GeoResult;
 import io.github.christosmouzouris.urlshortener.util.RequestInfoUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.coyote.Request;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Service layer for managing analytics for short URLs
@@ -19,10 +26,15 @@ import java.time.LocalDateTime;
 public class AnalyticsService {
 
     private final ClickEventRepository clickEventRepository;
+    private final UrlRepository urlRepository;
     private final RequestInfoUtil requestInfoUtil;
 
-    public AnalyticsService(ClickEventRepository clickEventRepository,  RequestInfoUtil requestInfoUtil) {
+    public AnalyticsService(ClickEventRepository clickEventRepository,
+                            RequestInfoUtil requestInfoUtil,
+                            UrlRepository urlRepository) {
+
         this.clickEventRepository = clickEventRepository;
+        this.urlRepository = urlRepository;
         this.requestInfoUtil = requestInfoUtil;
     }
 
@@ -45,5 +57,76 @@ public class AnalyticsService {
         clickEvent.setLocationDetails(geoResult.getLocationDetails());
 
         clickEventRepository.save(clickEvent);
+    }
+
+    public long getTotalClicks() {
+        return clickEventRepository.count();
+    }
+
+    /**
+     * Retrieves the count of clicks by each client type from the repository and maps the result
+     * to the specified response DTO record
+     *
+     * @return the list of client types with their counted clicks
+     */
+    public List<ClicksByBrowserResponseDto> getTotalClicksByBrowser() {
+        return clickEventRepository.findTotalClicksByBrowser().stream()
+                .map(ce -> new ClicksByBrowserResponseDto(ce.getCount(), ce.getClientType()))
+                .toList();
+    }
+
+    /**
+     * Retrieves the count of clicks by each client type for a specified short URL and maps
+     * the result to the specified response DTO record
+     *
+     * @param shortUrl the URL to filter the clicks by
+     * @return the list of client types with their counted clicks for the specified URL
+     */
+    public List<ClicksByBrowserResponseDto> getTotalClicksByBrowserForUrl(String shortUrl) {
+        Url url = urlRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new UrlNotFoundException(shortUrl));
+        return clickEventRepository.findTotalClicksByBrowserForUrl(url.getId()).stream()
+                .map(ce -> new ClicksByBrowserResponseDto(ce.getCount(), ce.getClientType()))
+                .toList();
+    }
+
+    /**
+     * Retrieves the count of clicks by each location and maps the result to the specified
+     * response DTO record
+     *
+     * @return the list of locations with their counted clicks
+     */
+    public List<ClicksByLocationResponseDto> getTotalClicksByLocation() {
+        return clickEventRepository.findTotalClicksByLocation().stream()
+                .map(ce -> new ClicksByLocationResponseDto(ce.getCount(), ce.getLocation()))
+                .toList();
+    }
+
+    public List<ClickEvent> getAllClicksForLocation(String location) {
+        return clickEventRepository.findByLocation(location);
+    }
+
+    /**
+     * Retrieve all clicks for specified URL that are not submitted by suspicious activity such as bots
+     *
+     * @param shortUrl the URL to filter clicks by
+     * @return the list of clicks
+     */
+    public List<ClickEvent> getRealClicks(String shortUrl){
+        Url url = urlRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new UrlNotFoundException(shortUrl));
+        return clickEventRepository.findAllClickEventsFilterByBots(url.getId());
+    }
+
+    /**
+     * Retrieve the URLs that have had the most clicks in descending order
+     *
+     * @param limit the number of entries to limit the search to
+     * @return list of URLs with a count of their clicks
+     */
+    public List<TopUrlsResponseDto> getTopUrls(int limit){
+        return clickEventRepository.findTopUrls(limit).stream()
+                .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getUrls()))
+                .toList();
     }
 }

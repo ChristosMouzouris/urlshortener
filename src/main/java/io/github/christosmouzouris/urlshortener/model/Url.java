@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_shortUrl", columnList = "shortUrl")
         }
 )
-
 public class Url {
 
     @Id

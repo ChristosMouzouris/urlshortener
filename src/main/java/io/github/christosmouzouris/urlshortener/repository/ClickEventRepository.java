@@ -37,6 +37,6 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
     List<TopUrlsProjection> findTopUrls(@Param("limit") int limit);
 
     @Query("Select ce FROM ClickEvent ce " +
-            "WHERE ce.clientType != 'Bots' AND ce.shortUrlId = :shortUrlid")
+            "WHERE ce.clientType != 'BOT' AND ce.shortUrlId = :shortUrlId")
     List<ClickEvent> findAllClickEventsFilterByBots(@Param("shortUrlId") long shortUrlId);
 }

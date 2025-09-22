@@ -51,7 +51,6 @@ public class AnalyticsService {
         clickEvent.setClientType(requestInfoUtil.getClient(request));
 
         GeoResult geoResult = requestInfoUtil.getGeoResult(request);
-        System.out.println("The country code to be persisted" + geoResult.getCountryCode());
         clickEvent.setCountryCode(geoResult.getCountryCode());
         clickEvent.setLocationDetails(geoResult.getLocationDetails());
 

@@ -1,9 +1,11 @@
 package io.github.christosmouzouris.urlshortener.service;
 
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
+import io.github.christosmouzouris.urlshortener.exception.UrlUpdateFailedException;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.HashidsUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,18 +69,26 @@ public class UrlService {
 
     /**
      * Retrieves and updates URL entity when accessed
-     * Updates last accessed time stamp and click counter
+     * Updates last accessed time stamp
      *
      * @param shortUrl The short URL segment to look up
-     * @return the updated and persisted URL entity
+     * @return the updated URL entity
      * @throws UrlNotFoundException if no URL is associated with the given shortUrl
+     * @throws UrlUpdateFailedException if the update of the last accessed date failed in the DB
      */
+    @Transactional
     public Url accessUrl(String shortUrl) {
         Url url = urlRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new UrlNotFoundException(shortUrl));
-        url.setLastAccessedDate(LocalDateTime.now());
 
-        return urlRepository.save(url);
+        LocalDateTime now = LocalDateTime.now();
+        int updated = urlRepository.updateLastAccessedDate(shortUrl, now);
+        if (updated == 0) {
+            throw new UrlUpdateFailedException(shortUrl);
+        }
+
+        url.setLastAccessedDate(now);
+        return url;
     }
 
     public List<Url> getAllUrls() {

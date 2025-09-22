@@ -66,7 +66,7 @@ public class RequestInfoUtil {
 
         Client client = uaParser.parse(uaString);
 
-
+        System.out.println(client);
         return ClientType.fromIdentifier(
                 client.userAgent.family,
                 client.device.family,
@@ -85,7 +85,8 @@ public class RequestInfoUtil {
         String ip = getClientIP(request);
 
         Map<String, Object> geoRaw;
-        String url = "https://ipapi.co/" + ip + "/json/";
+        // String url = "https://ipapi.co/" + ip + "/json/";
+        String url = "https://ipapi.co/8.8.8.8/json/";
 
         try {
             geoRaw = Optional.ofNullable(

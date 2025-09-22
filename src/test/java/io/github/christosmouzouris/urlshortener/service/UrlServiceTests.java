@@ -131,7 +131,7 @@ public class UrlServiceTests {
                 .thenReturn(Optional.empty());
 
         // When: the access Url method is called with a short Url that does not exist
-        // Then: a UrlNotFoundException is thrown
+        // Then: a UrlNotFoundException is thrown with the correct message
         assertThatThrownBy(() -> urlService.accessUrl(shortUrl))
                 .isInstanceOf(UrlNotFoundException.class)
                 .hasMessage("Url not found: " + shortUrl);

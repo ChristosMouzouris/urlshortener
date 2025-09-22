@@ -200,7 +200,7 @@ public class AnalyticsServiceTests {
         assertThat(result.get(1).shortUrl()).isEqualTo(projection2.getShortUrl());
     }
 
-    // Private method to construct objects
+    // Private methods to construct objects
     private Url createUrl() {
         Url url = new Url();
         url.setId(1L);

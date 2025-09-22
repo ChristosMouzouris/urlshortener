@@ -1,5 +1,7 @@
 package io.github.christosmouzouris.urlshortener.service;
 
+import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
+import io.github.christosmouzouris.urlshortener.exception.UrlUpdateFailedException;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.HashidsUtil;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -99,7 +102,7 @@ public class UrlServiceTests {
 
         LocalDateTime oldDate = url.getLastAccessedDate();
 
-        when(urlRepository.findByShortUrl("short"))
+        when(urlRepository.findByShortUrl(url.getShortUrl()))
                 .thenReturn(Optional.of(url));
 
         when(urlRepository.updateLastAccessedDate(eq(url.getShortUrl()), any(LocalDateTime.class)))
@@ -121,6 +124,44 @@ public class UrlServiceTests {
 
     @Test
     public void shouldThrowErrorIfUrlDoesNotExist() {
+        // Given: a short Url to find by
+        String shortUrl = "short";
 
+        when(urlRepository.findByShortUrl(shortUrl))
+                .thenReturn(Optional.empty());
+
+        // When: the access Url method is called with a short Url that does not exist
+        // Then: a UrlNotFoundException is thrown
+        assertThatThrownBy(() -> urlService.accessUrl(shortUrl))
+                .isInstanceOf(UrlNotFoundException.class)
+                .hasMessage("Url not found: " + shortUrl);
+
+        // And: the updatedLastAccessedDate repository method is never called
+        verify(urlRepository, never()).updateLastAccessedDate(anyString(), any());
+    }
+
+    @Test
+    public void shouldThrowErrorIfUrlExistsButUpdateFailed() {
+        // Given: a new Url object with a short Url that exists in the repository
+        Url url = new Url();
+        url.setId(1L);
+        url.setShortUrl("short");
+        url.setLongUrl("https://urlshortener.com");
+        url.setLastAccessedDate(LocalDateTime.now());
+
+        when(urlRepository.findByShortUrl(url.getShortUrl()))
+                .thenReturn(Optional.of(url));
+        when(urlRepository.updateLastAccessedDate(eq(url.getShortUrl()), any()))
+                .thenReturn(0);
+
+        // When: The access Url method is called with an existing url but date update fails
+        // Then: a UrlUpdateFailedException is thrown
+        assertThatThrownBy(() -> urlService.accessUrl(url.getShortUrl()))
+                .isInstanceOf(UrlUpdateFailedException.class)
+                .hasMessage("Url: " + url.getShortUrl() + " was found but some concurrent operation or DB " +
+                        "prevented the update");
+
+        // And: the updateLastAccessedDate repository method is called once
+        verify(urlRepository, times(1)).updateLastAccessedDate(eq("short"), any());
     }
 }

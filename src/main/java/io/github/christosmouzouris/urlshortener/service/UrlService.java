@@ -1,6 +1,7 @@
 package io.github.christosmouzouris.urlshortener.service;
 
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
+import io.github.christosmouzouris.urlshortener.exception.UrlUpdateFailedException;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.HashidsUtil;
@@ -73,6 +74,7 @@ public class UrlService {
      * @param shortUrl The short URL segment to look up
      * @return the updated URL entity
      * @throws UrlNotFoundException if no URL is associated with the given shortUrl
+     * @throws UrlUpdateFailedException if the update of the last accessed date failed in the DB
      */
     @Transactional
     public Url accessUrl(String shortUrl) {
@@ -82,7 +84,7 @@ public class UrlService {
         LocalDateTime now = LocalDateTime.now();
         int updated = urlRepository.updateLastAccessedDate(shortUrl, now);
         if (updated == 0) {
-            throw new UrlNotFoundException(shortUrl);
+            throw new UrlUpdateFailedException(shortUrl);
         }
 
         url.setLastAccessedDate(now);

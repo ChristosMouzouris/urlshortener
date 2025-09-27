@@ -6,7 +6,6 @@ import io.github.christosmouzouris.urlshortener.model.Url;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class UrlMapperImpl implements UrlMapper {
@@ -27,6 +26,7 @@ public class UrlMapperImpl implements UrlMapper {
         );
     }
 
+    @Override
     public List<UrlResponseDto> toResponseDtoList(List<Url> urls) {
         return urls.stream()
                 .map(this::toResponseDto)

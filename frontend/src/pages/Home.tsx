@@ -5,6 +5,8 @@ import type { UrlResponse } from '../types/urlResponse.ts';
 import FrostedCard from '../components/FrostedCard.tsx';
 import { getErrorMessage } from '../utilities/utilities.ts';
 import { getShortCode } from '../services/api.ts';
+import Stats from '../components/Stats.tsx';
+import TopUrls from '../components/TopUrls.tsx';
 
 function Home() {
   const [error, setError] = useState('');
@@ -26,15 +28,63 @@ function Home() {
 
   return (
     <div className="mt-10">
-      <div className="flex items-center justify-center">
-        <InputBar onInput={handleInput} placeholder="Enter a long url..." />
+      <div className="flex flex-col items-center justify-center text-center space-y-3">
+        <p className="font-bold text-5xl text-orange-500">
+          Shorten your links! Track your impact!
+        </p>
+        <p>
+          Quick, easy and lightweight service to create short codes for long
+          URLs.
+        </p>
+        <p>Track analytics for each short code.</p>
+      </div>
+      <div className="flex items-center justify-center mt-20">
+        <InputBar onInput={handleInput} placeholder="Enter a long URL..." />
       </div>
       {error ? <FrostedCard text={error} /> : ''}
       {loading ? (
-        <FrostedCard text="Loading" /> // Display a spinner actually
+        <div className="flex items-center justify-center">
+          <svg
+            className="animate-spin"
+            height="50"
+            viewBox="0 0 24 24"
+            width="50"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 12C2 6.47715 6.47715 2 12 2V5C8.13401 5 5 8.13401 5 12H2Z"
+              fill="#FF8904"
+            />
+          </svg>
+        </div>
       ) : (
         '' // This should be displaying nothing
       )}
+      <div className="max-w-6xl mx-auto mt-20 px-4 grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+        <FrostedCard
+          heroText="⚡"
+          heroTitle="Fast Shortening"
+          description="Shorten your URLs in seconds."
+        />
+
+        <FrostedCard
+          heroText="📈"
+          heroTitle="Analytics"
+          description="Track clicks for each short code."
+        />
+
+        <FrostedCard
+          heroText="🤖"
+          heroTitle="Filter BOTS"
+          description="Shorten your URLs in seconds"
+        />
+      </div>
+      <div>
+        <Stats />
+      </div>
+      <div>
+        <TopUrls />
+      </div>
       <div id="about">
         <About />
       </div>

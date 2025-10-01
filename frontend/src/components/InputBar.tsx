@@ -27,7 +27,7 @@ const InputBar: FC<InputBarProps> = ({ onInput, placeholder }) => {
       />
       <button
         type="submit"
-        className="rounded-r-full bg-orange-400 px-4 py-2 text-white font-bold hover:shadow-orange-500 focus:ring-2 focus:ring-white"
+        className="rounded-r-full bg-orange-400 px-4 py-2 text-white font-bold hover:shadow-orange-500 cursor-pointer focus:ring-2 focus:ring-white"
       >
         Get Code
       </button>

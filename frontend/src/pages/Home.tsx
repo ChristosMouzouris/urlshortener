@@ -1,16 +1,19 @@
 import About from './About.tsx';
 import InputBar from '../components/InputBar.tsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { UrlResponse } from '../types/urlResponse.ts';
 import FrostedCard from '../components/FrostedCard.tsx';
-import { getErrorMessage } from '../utilities/utilities.ts';
 import { getShortCode } from '../services/api.ts';
 import Stats from '../components/Stats.tsx';
 import TopUrls from '../components/TopUrls.tsx';
+import { NotificationEnum } from '../types/notificationEnum.ts';
+import { useNotification } from '../components/NotificationContext.tsx';
+import type { ApiError } from '../services/fetchWrapper.ts';
 
 function Home() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { addNotification } = useNotification();
 
   const handleInput = async (url: string) => {
     if (loading) return;
@@ -20,11 +23,25 @@ function Home() {
       const shortCode: UrlResponse = await getShortCode(url);
       console.log(shortCode);
     } catch (err) {
-      setError(getErrorMessage(err));
+      const apiError = err as ApiError;
+      if (apiError.kind === 'network') {
+        setError('Network error. Please check your connection.');
+      } else if (apiError.kind === 'server') {
+        setError(apiError.message);
+      } else {
+        setError('Unexpected error occurred.');
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      addNotification(error, NotificationEnum.fail);
+      setError('');
+    }
+  }, [error, addNotification]);
 
   return (
     <div className="mt-10">
@@ -41,7 +58,6 @@ function Home() {
       <div className="flex items-center justify-center mt-20">
         <InputBar onInput={handleInput} placeholder="Enter a long URL..." />
       </div>
-      {error ? <FrostedCard text={error} /> : ''}
       {loading ? (
         <div className="flex items-center justify-center">
           <svg
@@ -57,9 +73,7 @@ function Home() {
             />
           </svg>
         </div>
-      ) : (
-        '' // This should be displaying nothing
-      )}
+      ) : null}
       <div className="max-w-6xl mx-auto mt-20 px-4 grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
         <FrostedCard
           heroText="⚡"

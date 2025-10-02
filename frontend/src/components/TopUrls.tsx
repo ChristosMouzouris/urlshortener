@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { getTopUrls } from '../services/api.ts';
-import { getErrorMessage } from '../utilities/utilities.ts';
 import type { TopUrlsResponse } from '../types/topUrlsResponse.ts';
 import DataTable from './DataTable.tsx';
+import { NotificationEnum } from '../types/notificationEnum.ts';
+import { useNotification } from './NotificationContext.tsx';
+import type { ApiError } from '../services/fetchWrapper.ts';
 
 const TopUrls = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [topUrls, setTopUrls] = useState<TopUrlsResponse[] | null>(null);
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     const handleGetTopUrls = async () => {
@@ -15,11 +18,16 @@ const TopUrls = () => {
       try {
         const data: TopUrlsResponse[] = await getTopUrls();
         setTopUrls(data);
-        console.log(data);
       } catch (err) {
-        const message: string = getErrorMessage(err);
-        setError(message);
-        console.log(message);
+        const apiError = err as ApiError;
+        if (apiError.kind === 'network') {
+          setError('Network error. Please check your connection.');
+        } else if (apiError.kind === 'server') {
+          setError(apiError.message);
+        } else {
+          setError('Unexpected error occurred.');
+        }
+        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -28,7 +36,13 @@ const TopUrls = () => {
     void handleGetTopUrls();
   }, []);
 
-  if (error) return <p>Error...</p>;
+  useEffect(() => {
+    if (error) {
+      addNotification(error, NotificationEnum.fail);
+    }
+    setError('');
+  }, [error, addNotification]);
+
   if (!topUrls) return null;
 
   const headers = ['Short Code', 'Clicks'];

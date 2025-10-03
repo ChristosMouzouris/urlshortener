@@ -2,6 +2,7 @@ package io.github.christosmouzouris.urlshortener.service;
 
 import io.github.christosmouzouris.urlshortener.dto.ClicksByBrowserResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.ClicksByLocationResponseDto;
+import io.github.christosmouzouris.urlshortener.dto.StatsResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.TopUrlsResponseDto;
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
@@ -11,6 +12,8 @@ import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.GeoResult;
 import io.github.christosmouzouris.urlshortener.util.RequestInfoUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,6 +58,10 @@ public class AnalyticsService {
         clickEvent.setLocationDetails(geoResult.getLocationDetails());
 
         clickEventRepository.save(clickEvent);
+    }
+
+    public StatsResponseDto getStats(){
+        return new StatsResponseDto(clickEventRepository.count(), urlRepository.count());
     }
 
     public long getTotalClicks() {
@@ -123,7 +130,7 @@ public class AnalyticsService {
      * @return list of URLs with a count of their clicks
      */
     public List<TopUrlsResponseDto> getTopUrls(int limit){
-        return clickEventRepository.findTopUrls(limit).stream()
+        return clickEventRepository.findTopUrls(10).stream()
                 .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getShortUrl()))
                 .toList();
     }

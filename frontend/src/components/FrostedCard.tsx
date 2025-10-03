@@ -11,7 +11,7 @@ const FrostedCard: React.FC<FrostedCardProps> = ({
   description,
 }) => {
   return (
-    <div className="max-w-[400px] rounded-2xl bg-white/[0.025] backdrop-blur-md border border-white/10 shadow-lg shadow-black/50 text-center p-6">
+    <div className="w-[300px] rounded-2xl bg-white/[0.025] backdrop-blur-md border border-white/10 shadow-lg shadow-black/50 text-center p-6">
       <span className="text-4xl ">{heroText || ''}</span>
       <h3 className="font-bold text-2xl text-orange-500 mt-4">
         {heroTitle || ''}

@@ -74,7 +74,7 @@ function Home() {
           </svg>
         </div>
       ) : null}
-      <div className="max-w-6xl mx-auto mt-20 px-4 grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+      <div className="max-w-6xl mx-auto mt-20 px-4 flex flex-wrap justify-center gap-6">
         <FrostedCard
           heroText="⚡"
           heroTitle="Fast Shortening"
@@ -90,7 +90,13 @@ function Home() {
         <FrostedCard
           heroText="🤖"
           heroTitle="Filter BOTS"
-          description="Shorten your URLs in seconds"
+          description="Shorten your URLs in seconds."
+        />
+
+        <FrostedCard
+          heroText="⚡"
+          heroTitle="Redirect"
+          description="Lightining fast redirects."
         />
       </div>
       <div>

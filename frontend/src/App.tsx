@@ -1,10 +1,23 @@
 import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home.tsx';
+import Analytics from './pages/Analytics.tsx';
+import NavBar from './components/NavBar.tsx';
+import NotificationProvider from './components/NotificationContainer.tsx';
 
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-    </div>
+    <NotificationProvider>
+      <div className={'text-violet-50'}>
+        <NavBar />
+        <main>
+          <Routes>
+            <Route path={'/'} element={<Home />} />
+            <Route path={'/analytics'} element={<Analytics />} />
+          </Routes>
+        </main>
+      </div>
+    </NotificationProvider>
   );
 }
 

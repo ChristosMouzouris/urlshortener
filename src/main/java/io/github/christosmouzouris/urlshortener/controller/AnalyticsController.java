@@ -25,6 +25,11 @@ public class AnalyticsController {
         return analyticsService.getTotalClicks();
     }
 
+    @GetMapping("/stats")
+    public StatsResponseDto getStats() {
+        return analyticsService.getStats();
+    }
+
     @GetMapping("/by-browser")
     public List<ClicksByBrowserResponseDto> getTotalClicksByBrowser() {
         return analyticsService.getTotalClicksByBrowser();

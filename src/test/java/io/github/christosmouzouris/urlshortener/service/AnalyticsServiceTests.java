@@ -182,9 +182,11 @@ public class AnalyticsServiceTests {
         TopUrlsProjection projection1 = mock(TopUrlsProjection.class);
         when(projection1.getCount()).thenReturn(5L);
         when(projection1.getShortUrl()).thenReturn("short");
+        when(projection1.getLongUrl()).thenReturn("long");
         TopUrlsProjection projection2 = mock(TopUrlsProjection.class);
         when(projection2.getCount()).thenReturn(10L);
         when(projection1.getShortUrl()).thenReturn("short1");
+        when(projection1.getLongUrl()).thenReturn("long1");
 
         when(clickEventRepository.findTopUrls(2))
                 .thenReturn(List.of(projection1, projection2));
@@ -196,8 +198,10 @@ public class AnalyticsServiceTests {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).clicks()).isEqualTo(projection1.getCount());
         assertThat(result.get(0).shortUrl()).isEqualTo(projection1.getShortUrl());
+        assertThat(result.get(0).longUrl()).isEqualTo(projection1.getLongUrl());
         assertThat(result.get(1).clicks()).isEqualTo(projection2.getCount());
         assertThat(result.get(1).shortUrl()).isEqualTo(projection2.getShortUrl());
+        assertThat(result.get(1).longUrl()).isEqualTo(projection2.getLongUrl());
     }
 
     // Private methods to construct objects

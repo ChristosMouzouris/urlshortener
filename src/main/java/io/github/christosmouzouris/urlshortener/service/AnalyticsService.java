@@ -127,11 +127,11 @@ public class AnalyticsService {
      * Retrieve the URLs that have had the most clicks in descending order
      *
      * @param limit the number of entries to limit the search to
-     * @return list of URLs with a count of their clicks
+     * @return list of URLs with a count of their clicks, short urls and original domain
      */
     public List<TopUrlsResponseDto> getTopUrls(int limit){
-        return clickEventRepository.findTopUrls(10).stream()
-                .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getShortUrl()))
+        return clickEventRepository.findTopUrls(limit).stream()
+                .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getShortUrl(), ce.getLongUrl()))
                 .toList();
     }
 }

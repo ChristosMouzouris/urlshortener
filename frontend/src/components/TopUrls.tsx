@@ -45,8 +45,8 @@ const TopUrls = () => {
 
   if (!topUrls) return null;
 
-  const headers = ['Short Code', 'Clicks'];
-  const rows = topUrls.map((row) => [row.shortUrl, row.clicks]);
+  const headers = ['Short Code', 'Clicks', 'Domain'];
+  const rows = topUrls.map((row) => [row.shortUrl, row.clicks, row.domain]);
 
   return loading ? (
     <div className="flex items-center justify-center">

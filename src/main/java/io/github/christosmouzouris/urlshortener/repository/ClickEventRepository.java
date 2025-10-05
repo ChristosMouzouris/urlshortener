@@ -30,10 +30,10 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, Long> {
     List<ClickEvent> findByLocation(@Param("countryCode") String countryCode);
 
     @Query(
-            value = "SELECT COUNT(ce.id) AS count, u.short_url AS shortUrl " +
+            value = "SELECT COUNT(ce.id) AS count, u.short_url AS shortUrl, u.long_url AS longUrl " +
                     "FROM click_event ce " +
                     "JOIN url u ON ce.short_url_id = u.id " +
-                    "GROUP BY u.short_url " +
+                    "GROUP BY u.short_url, u.long_url " +
                     "ORDER BY COUNT(ce.id) DESC " +
                     "LIMIT :limit",
             nativeQuery = true

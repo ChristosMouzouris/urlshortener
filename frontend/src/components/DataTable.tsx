@@ -7,7 +7,7 @@ interface TableProps {
 const DataTable: React.FC<TableProps> = ({ headers, rows }) => {
   return (
     <div className="mt-20 flex justify-center">
-      <div className="w-full max-w-6xl overflow-x-auto">
+      <div className="w-full max-w-6xl overflow-x-auto shadow-md hover:shadow-xl transition-shadow duration-200 rounded-xl">
         <div>
           <h1 className="text-orange-500 text-center text-3xl font-bold mt-10">
             Top URLs

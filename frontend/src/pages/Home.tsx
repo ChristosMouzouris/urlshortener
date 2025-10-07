@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import type { UrlResponse } from '../types/urlResponse.ts';
 import FrostedCard from '../components/FrostedCard.tsx';
 import { getShortCode } from '../services/api.ts';
-import Stats from '../components/Stats.tsx';
-import TopUrls from '../components/TopUrls.tsx';
+import { StatsContainer } from '../components/StatsContainer.tsx';
+import { TopUrls } from '../components/TopUrls.tsx';
 import { NotificationEnum } from '../types/notificationEnum.ts';
 import { useNotification } from '../components/NotificationContext.tsx';
 import type { ApiError } from '../services/fetchWrapper.ts';
@@ -100,10 +100,10 @@ function Home() {
         />
       </div>
       <div>
-        <Stats />
+        <StatsContainer />
       </div>
       <div>
-        <TopUrls />
+        <TopUrls limit={5} />
       </div>
       <div id="about">
         <About />

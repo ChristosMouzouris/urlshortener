@@ -1,8 +1,24 @@
+import { StatsContainer } from '../components/StatsContainer.tsx';
+import { TopUrls } from '../components/TopUrls.tsx';
+import { BrowserAnalytics } from '../components/BrowserAnalytics.tsx';
+import { CountryAnalytics } from '../components/CountryAnalytics.tsx';
+
 function Analytics() {
   return (
-    <div>
-      <h2>No analytics page yet.</h2>
-    </div>
+    <>
+      <div>
+        <StatsContainer extended />
+      </div>
+      <div>
+        <TopUrls limit={10} />
+      </div>
+      <div>
+        <BrowserAnalytics />
+      </div>
+      <div>
+        <CountryAnalytics />
+      </div>
+    </>
   );
 }
 

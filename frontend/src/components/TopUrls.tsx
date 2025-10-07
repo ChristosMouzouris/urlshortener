@@ -1,47 +1,20 @@
-import { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { getTopUrls } from '../services/api.ts';
 import type { TopUrlsResponse } from '../types/topUrlsResponse.ts';
 import DataTable from './DataTable.tsx';
-import { NotificationEnum } from '../types/notificationEnum.ts';
-import { useNotification } from './NotificationContext.tsx';
-import type { ApiError } from '../services/fetchWrapper.ts';
+import { useFetch } from '../hooks/useFetch.ts';
 
-const TopUrls = () => {
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [topUrls, setTopUrls] = useState<TopUrlsResponse[] | null>(null);
-  const { addNotification } = useNotification();
+interface TopUrlsProps {
+  limit?: number;
+}
 
-  useEffect(() => {
-    const handleGetTopUrls = async () => {
-      setLoading(true);
-      try {
-        const data: TopUrlsResponse[] = await getTopUrls();
-        setTopUrls(data);
-      } catch (err) {
-        const apiError = err as ApiError;
-        if (apiError.kind === 'network') {
-          setError('Network error. Please check your connection.');
-        } else if (apiError.kind === 'server') {
-          setError(apiError.message);
-        } else {
-          setError('Unexpected error occurred.');
-        }
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+export const TopUrls: React.FC<TopUrlsProps> = ({ limit = 10 }) => {
+  const args = useMemo<[number]>(() => [limit], [limit]);
 
-    void handleGetTopUrls();
-  }, []);
-
-  useEffect(() => {
-    if (error) {
-      addNotification(error, NotificationEnum.fail);
-    }
-    setError('');
-  }, [error, addNotification]);
+  const { data: topUrls, loading } = useFetch<TopUrlsResponse[], [number]>(
+    getTopUrls,
+    args
+  );
 
   if (!topUrls) return null;
 
@@ -67,5 +40,3 @@ const TopUrls = () => {
     <DataTable headers={headers} rows={rows} />
   );
 };
-
-export default TopUrls;

@@ -23,11 +23,11 @@ const InputBar: FC<InputBarProps> = ({ onInput, placeholder }) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder={placeholder || ''}
-        className="flex-grow px-4 rounded-l-full bg-white/[0.025] backdrop-blur-md border border-white/10"
+        className="flex-grow px-4 rounded-l-full bg-white/[0.025] backdrop-blur-md border border-white/10 focus:outline-none focus:ring-1 focus:ring-orange-500 placeholder-white/50"
       />
       <button
         type="submit"
-        className="rounded-r-full bg-orange-400 px-4 py-2 text-white font-bold hover:shadow-orange-500 cursor-pointer focus:ring-2 focus:ring-white"
+        className="rounded-r-full bg-orange-400 px-4 py-2 font-bold hover:shadow-orange-500 cursor-pointer focus:ring-2 focus:ring-white"
       >
         Get Code
       </button>

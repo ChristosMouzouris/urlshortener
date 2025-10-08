@@ -5,7 +5,7 @@ import type { UrlResponse } from '../types/urlResponse.ts';
 import FrostedCard from '../components/FrostedCard.tsx';
 import { getShortCode } from '../services/api.ts';
 import { StatsContainer } from '../components/StatsContainer.tsx';
-import { TopUrls } from '../components/TopUrls.tsx';
+import { TopUrlsContainer } from '../components/TopUrlsContainer.tsx';
 import { NotificationEnum } from '../types/notificationEnum.ts';
 import { useNotification } from '../components/NotificationContext.tsx';
 import type { ApiError } from '../services/fetchWrapper.ts';
@@ -103,7 +103,7 @@ function Home() {
         <StatsContainer />
       </div>
       <div>
-        <TopUrls limit={5} />
+        <TopUrlsContainer limit={5} />
       </div>
       <div id="about">
         <About />

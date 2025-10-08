@@ -13,6 +13,10 @@ public record TopUrlsResponseDto(
     }
 
     private static String extractDomain(String longUrl) {
+        if (longUrl == null || longUrl.isEmpty()) {
+            return "";
+        }
+
         try {
             URI uri = new URI(longUrl);
             String host = uri.getHost();

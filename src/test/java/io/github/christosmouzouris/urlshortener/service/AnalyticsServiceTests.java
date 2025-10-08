@@ -2,10 +2,12 @@ package io.github.christosmouzouris.urlshortener.service;
 
 import io.github.christosmouzouris.urlshortener.dto.ClicksByBrowserResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.ClicksByLocationResponseDto;
+import io.github.christosmouzouris.urlshortener.dto.ClicksTrendResponseDto;
 import io.github.christosmouzouris.urlshortener.dto.TopUrlsResponseDto;
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
 import io.github.christosmouzouris.urlshortener.mapper.ClicksByBrowserProjection;
 import io.github.christosmouzouris.urlshortener.mapper.ClicksByLocationProjection;
+import io.github.christosmouzouris.urlshortener.mapper.ClicksTrendProjection;
 import io.github.christosmouzouris.urlshortener.mapper.TopUrlsProjection;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
 import io.github.christosmouzouris.urlshortener.model.ClientType;
@@ -25,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -182,11 +185,11 @@ public class AnalyticsServiceTests {
         TopUrlsProjection projection1 = mock(TopUrlsProjection.class);
         when(projection1.getCount()).thenReturn(5L);
         when(projection1.getShortUrl()).thenReturn("short");
-        when(projection1.getLongUrl()).thenReturn("long");
+        when(projection1.getLongUrl()).thenReturn("domain");
         TopUrlsProjection projection2 = mock(TopUrlsProjection.class);
         when(projection2.getCount()).thenReturn(10L);
         when(projection1.getShortUrl()).thenReturn("short1");
-        when(projection1.getLongUrl()).thenReturn("long1");
+        when(projection1.getLongUrl()).thenReturn("domain1");
 
         when(clickEventRepository.findTopUrls(2))
                 .thenReturn(List.of(projection1, projection2));
@@ -198,10 +201,49 @@ public class AnalyticsServiceTests {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).clicks()).isEqualTo(projection1.getCount());
         assertThat(result.get(0).shortUrl()).isEqualTo(projection1.getShortUrl());
-        assertThat(result.get(0).longUrl()).isEqualTo(projection1.getLongUrl());
+        assertThat(result.get(0).domain()).isEqualTo(projection1.getLongUrl());
         assertThat(result.get(1).clicks()).isEqualTo(projection2.getCount());
         assertThat(result.get(1).shortUrl()).isEqualTo(projection2.getShortUrl());
-        assertThat(result.get(1).longUrl()).isEqualTo(projection2.getLongUrl());
+        assertThat(result.get(1).domain()).isEqualTo(projection2.getLongUrl());
+    }
+
+    @Test
+    public void shouldReturnClickTrends() {
+        // Given: the two clicks trends projections found by the repository
+        ClicksTrendProjection projection1 = mock(ClicksTrendProjection.class);
+        ClicksTrendProjection projection2 = mock(ClicksTrendProjection.class);
+
+        LocalDate today = LocalDate.now();
+        when(projection1.getClicks()).thenReturn(5L);
+        when(projection1.getDate()).thenReturn(LocalDate.now().minusDays(2));
+        when(projection2.getClicks()).thenReturn(10L);
+        when(projection2.getDate()).thenReturn(LocalDate.now().minusDays(1));
+
+        LocalDate startDate = today.minusDays(2);
+        LocalDateTime cutoff = startDate.atStartOfDay();
+
+        when(clickEventRepository.findClicksTrend(cutoff))
+                .thenReturn(List.of(projection1, projection2));
+
+        // When: the getClicksTrends method is called
+        List<ClicksTrendResponseDto> result = analyticsService.getClicksTrends(2);
+
+        // Then: the array should contain 3 entries
+        assertThat(result.size()).isEqualTo(3);
+
+        // And: the oldest date is first
+        assertThat(result.get(0).clicks()).isEqualTo(projection1.getClicks());
+        assertThat(today.minusDays(2)).isEqualTo(result.get(0).date());
+
+        assertThat(result.get(1).clicks()).isEqualTo(projection2.getClicks());
+        assertThat(today.minusDays(1)).isEqualTo(result.get(1).date());
+
+        // And: today's date will be auto filled with 0 clicks
+        assertThat(result.get(2).clicks()).isEqualTo(0L);
+        assertThat(today).isEqualTo(result.get(2).date());
+
+        // And: the findClicksTrends repository method is called once
+        verify(clickEventRepository, times(1)).findClicksTrend(cutoff);
     }
 
     // Private methods to construct objects

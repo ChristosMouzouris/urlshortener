@@ -151,6 +151,13 @@ public class AnalyticsService {
                 .toList();
     }
 
+
+    /**
+     * Retrieve an ordered list of dates with the amount of clicks tracked for each
+     *
+     * @param days the number of days to go back starting from today
+     * @return a list of records containing dates and number of clicks
+     */
     public List<ClicksTrendResponseDto> getClicksTrends(int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
         LocalDateTime cutoff = startDate.atStartOfDay();

@@ -1,7 +1,8 @@
 import { StatsContainer } from '../components/StatsContainer.tsx';
-import { TopUrls } from '../components/TopUrls.tsx';
-import { BrowserAnalytics } from '../components/BrowserAnalytics.tsx';
-import { CountryAnalytics } from '../components/CountryAnalytics.tsx';
+import { TopUrlsContainer } from '../components/TopUrlsContainer.tsx';
+import { BrowserAnalyticsContainer } from '../components/BrowserAnalyticsContainer.tsx';
+import { CountryAnalyticsContainer } from '../components/CountryAnalyticsContainer.tsx';
+import { ClicksTrendContainer } from '../components/ClicksTrendContainer.tsx';
 
 function Analytics() {
   return (
@@ -10,13 +11,16 @@ function Analytics() {
         <StatsContainer extended />
       </div>
       <div>
-        <TopUrls limit={10} />
+        <TopUrlsContainer limit={10} />
       </div>
       <div>
-        <BrowserAnalytics />
+        <BrowserAnalyticsContainer />
       </div>
       <div>
-        <CountryAnalytics />
+        <CountryAnalyticsContainer />
+      </div>
+      <div>
+        <ClicksTrendContainer />
       </div>
     </>
   );

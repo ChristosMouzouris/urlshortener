@@ -4,6 +4,7 @@ import type { StatsResponse } from '../types/statsResponse.ts';
 import type { BrowserResponse } from '../types/browserResponse.ts';
 import { fetchWrapper } from './fetchWrapper.ts';
 import type { CountryResponse } from '../types/countryResponse.ts';
+import type { ClicksTrendResponse } from '../types/clicksTrendResponse.ts';
 
 export const getShortCode = async (longUrl: string) =>
   fetchWrapper<UrlResponse>(`/api/url`, {
@@ -12,16 +13,17 @@ export const getShortCode = async (longUrl: string) =>
     body: JSON.stringify({ longUrl }),
   });
 
-export const getTopUrls = async () =>
-  fetchWrapper<TopUrlsResponse[]>(`/api/analytics/top-urls`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
+export const getTopUrls = async (limit?: number) =>
+  fetchWrapper<TopUrlsResponse[]>(
+    `/api/analytics/top-urls${limit ? `?limit=${limit}` : ''}`,
+    {
+      method: 'GET',
+    }
+  );
 
 export const getStats = async () =>
   fetchWrapper<StatsResponse>('/api/analytics/stats', {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
   });
 
 export const getClicksByBrowser = async (shortUrl?: string) => {
@@ -31,7 +33,6 @@ export const getClicksByBrowser = async (shortUrl?: string) => {
 
   return fetchWrapper<BrowserResponse[]>(endpoint, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
   });
 };
 
@@ -42,6 +43,13 @@ export const getClicksByCountry = async (shortUrl?: string) => {
 
   return fetchWrapper<CountryResponse[]>(endpoint, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
   });
 };
+
+export const getClicksTrend = async (days?: number) =>
+  fetchWrapper<ClicksTrendResponse[]>(
+    `/api/analytics/trends${days ? `?days=${days}` : ''}`,
+    {
+      method: 'GET',
+    }
+  );

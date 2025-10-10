@@ -1,10 +1,8 @@
 package io.github.christosmouzouris.urlshortener.service;
 
-import io.github.christosmouzouris.urlshortener.dto.ClicksByBrowserResponseDto;
-import io.github.christosmouzouris.urlshortener.dto.ClicksByLocationResponseDto;
-import io.github.christosmouzouris.urlshortener.dto.StatsResponseDto;
-import io.github.christosmouzouris.urlshortener.dto.TopUrlsResponseDto;
+import io.github.christosmouzouris.urlshortener.dto.*;
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
+import io.github.christosmouzouris.urlshortener.mapper.ClicksTrendProjection;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.ClickEventRepository;
@@ -12,12 +10,15 @@ import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.GeoResult;
 import io.github.christosmouzouris.urlshortener.util.RequestInfoUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service layer for managing analytics for short URLs
@@ -107,6 +108,21 @@ public class AnalyticsService {
                 .toList();
     }
 
+    /**
+     * Retrieves the count of click by each location (country code) for a specified short URL and maps
+     * the result to the specified response DTO record
+     *
+     * @param shortUrl the URL to filter the clicks by
+     * @return the list of country codes with their counted clicks for the specified URL
+     */
+    public List<ClicksByLocationResponseDto> getTotalClicksByLocationForUrl(String shortUrl) {
+        Url url = urlRepository.findByShortUrl(shortUrl)
+                .orElseThrow(() -> new UrlNotFoundException(shortUrl));
+        return clickEventRepository.findTotalClicksByLocationForUrl(url.getId()).stream()
+                .map(ce -> new ClicksByLocationResponseDto(ce.getCount(), ce.getCountryCode()))
+                .toList();
+    }
+
     public List<ClickEvent> getAllClicksForLocation(String location) {
         return clickEventRepository.findByLocation(location);
     }
@@ -132,6 +148,32 @@ public class AnalyticsService {
     public List<TopUrlsResponseDto> getTopUrls(int limit){
         return clickEventRepository.findTopUrls(limit).stream()
                 .map(ce -> new TopUrlsResponseDto(ce.getCount(), ce.getShortUrl(), ce.getLongUrl()))
+                .toList();
+    }
+
+
+    /**
+     * Retrieve an ordered list of dates with the amount of clicks tracked for each
+     *
+     * @param days the number of days to go back starting from today
+     * @return a list of records containing dates and number of clicks
+     */
+    public List<ClicksTrendResponseDto> getClicksTrends(int days) {
+        LocalDate startDate = LocalDate.now().minusDays(days);
+        LocalDateTime cutoff = startDate.atStartOfDay();
+
+        List<ClicksTrendProjection> rawTrends = clickEventRepository.findClicksTrend(cutoff);
+
+        Map<LocalDate, Long> clicksByDate = rawTrends.stream()
+                .collect(Collectors.toMap(
+                        ClicksTrendProjection::getDate,
+                        ClicksTrendProjection::getClicks,
+                        (a, b) -> a, LinkedHashMap::new
+                ));
+
+        return Stream.iterate(startDate, date -> date.plusDays(1))
+                .limit(days + 1L)
+                .map(date -> new ClicksTrendResponseDto(date, clicksByDate.getOrDefault(date, 0L)))
                 .toList();
     }
 }

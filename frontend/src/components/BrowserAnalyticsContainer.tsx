@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { getClicksByBrowser } from '../services/api.ts';
 import { useFetch } from '../hooks/useFetch.ts';
-import { getClicksByCountry } from '../services/api.ts';
-import type { CountryResponse } from '../types/countryResponse.ts';
-import { SkeletonCard } from './SkeletonCard.tsx';
 import { ChartDisplay } from './ChartDisplay.tsx';
+import type { BrowserResponse } from '../types/browserResponse.ts';
+import { useEffect, useState } from 'react';
+import { SkeletonCard } from './SkeletonCard.tsx';
 
-export const CountryAnalytics = () => {
+export const BrowserAnalyticsContainer = () => {
   const [shortUrl, setShortUrl] = useState('');
   const [debouncedShortUrl, setDebouncedShortUrl] = useState<
     string | undefined
@@ -22,14 +22,14 @@ export const CountryAnalytics = () => {
   const args: [string | undefined] = [debouncedShortUrl];
 
   const { data, loading, error } = useFetch<
-    CountryResponse[],
+    BrowserResponse[],
     [string | undefined]
-  >(getClicksByCountry, args);
+  >(getClicksByBrowser, args);
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-20 p-6 bg-white/[0.025] border border-white/10 rounded-xl backdrop-blur-md">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-orange-500 text-xl font-bold">Clicks by Country</h2>
+        <h2 className="text-orange-500 text-xl font-bold">Clicks by Browser</h2>
         <input
           type="text"
           placeholder="Filter by short code..."
@@ -44,9 +44,9 @@ export const CountryAnalytics = () => {
       ) : data && data.length > 0 ? (
         <ChartDisplay
           title=""
-          labels={data.map((b) => b.country)}
+          labels={data.map((b) => b.browser)}
           data={data.map((b) => b.clicks)}
-          defaultType="bar"
+          defaultType="pie"
           allowToggle
         />
       ) : (

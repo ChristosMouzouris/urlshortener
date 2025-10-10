@@ -45,6 +45,11 @@ public class AnalyticsController {
         return analyticsService.getTotalClicksByLocation();
     }
 
+    @GetMapping("/{shortUrl}/by-location")
+    public List<ClicksByLocationResponseDto> getTotalClicksByLocationForUrl(@PathVariable String shortUrl) {
+        return analyticsService.getTotalClicksByLocationForUrl(shortUrl);
+    }
+
     @GetMapping("/by-location/{location}")
     public List<ClickEventResponseDto> getAllClicksForLocation(@PathVariable String location) {
         List<ClickEvent> clickEvents = analyticsService.getAllClicksForLocation(location);
@@ -54,6 +59,11 @@ public class AnalyticsController {
     @GetMapping("/top-urls")
     public List<TopUrlsResponseDto> getTopUrls(@RequestParam(defaultValue = "10") int limit) {
         return analyticsService.getTopUrls(limit);
+    }
+
+    @GetMapping("/trends")
+    public List<ClicksTrendResponseDto> getTrends(@RequestParam(defaultValue = "14") int days) {
+        return analyticsService.getClicksTrends(days);
     }
 
     @GetMapping("/{shortUrl}/real-clicks")

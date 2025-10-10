@@ -8,7 +8,7 @@ interface TopUrlsProps {
   limit?: number;
 }
 
-export const TopUrls: React.FC<TopUrlsProps> = ({ limit = 10 }) => {
+export const TopUrlsContainer: React.FC<TopUrlsProps> = ({ limit = 10 }) => {
   const args = useMemo<[number]>(() => [limit], [limit]);
 
   const { data: topUrls, loading } = useFetch<TopUrlsResponse[], [number]>(

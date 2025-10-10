@@ -19,7 +19,7 @@ interface ChartDisplayProps {
   allowToggle?: boolean;
 }
 
-const COLOURS = ['#FF8904', '#FBBF24', '#3B82F6', '#10B981', '#6366F1'];
+const COLOURS = ['#FF8904', '#3B82F6', '#10B981', '#FBBF24', '#6366F1'];
 
 export const ChartDisplay: React.FC<ChartDisplayProps> = ({
   labels,
@@ -36,7 +36,7 @@ export const ChartDisplay: React.FC<ChartDisplayProps> = ({
   }));
 
   return (
-    <div className="p-4 rounded-2xl shadow-sm bg-white dark:bg-gray-900">
+    <div className="p-4 rounded-2xl shadow-sm bg-gray-900">
       <div className="flex justify-between items-center mb-4">
         {title && <h3 className="text-lg font-semibold">{title}</h3>}
         {allowToggle && (
@@ -44,7 +44,7 @@ export const ChartDisplay: React.FC<ChartDisplayProps> = ({
             onClick={() =>
               setChartType((prev) => (prev === 'bar' ? 'pie' : 'bar'))
             }
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md transition"
+            className="px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition"
           >
             Switch to {chartType === 'bar' ? 'Pie' : 'Bar'}
           </button>

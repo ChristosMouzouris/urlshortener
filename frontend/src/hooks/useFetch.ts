@@ -6,7 +6,8 @@ import { useNotification } from '../components/NotificationContext';
 export function useFetch<T, A extends unknown[]>(
   fetchFn: (...args: A) => Promise<T>,
   args: A,
-  notifyError: boolean = true
+  notifyError: boolean = true,
+  enabled: boolean = true
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,8 @@ export function useFetch<T, A extends unknown[]>(
   const fetchIdRef = useRef(0);
 
   useEffect(() => {
+    if (!enabled) return;
+
     if (
       hasFailedRef.current &&
       fetchIdRef.current &&

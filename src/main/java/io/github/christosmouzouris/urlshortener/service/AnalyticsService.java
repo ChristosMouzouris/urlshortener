@@ -4,19 +4,22 @@ import io.github.christosmouzouris.urlshortener.dto.*;
 import io.github.christosmouzouris.urlshortener.exception.UrlNotFoundException;
 import io.github.christosmouzouris.urlshortener.mapper.ClicksTrendProjection;
 import io.github.christosmouzouris.urlshortener.model.ClickEvent;
+import io.github.christosmouzouris.urlshortener.model.ClientType;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.ClickEventRepository;
 import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.GeoResult;
 import io.github.christosmouzouris.urlshortener.util.RequestInfoUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +34,11 @@ public class AnalyticsService {
     private final UrlRepository urlRepository;
     private final RequestInfoUtil requestInfoUtil;
 
+    private final Queue<ClickEvent> queue = new ConcurrentLinkedDeque<>();
+
+    private final int MAX_BATCH_SIZE = 100;  // flush when queue reaches this
+    private final long MAX_FLUSH_INTERVAL_MS = 100; // or every 100ms
+
     public AnalyticsService(ClickEventRepository clickEventRepository,
                             RequestInfoUtil requestInfoUtil,
                             UrlRepository urlRepository) {
@@ -41,24 +49,58 @@ public class AnalyticsService {
     }
 
     /**
-     * Handles the collection of all requires analytics for internal use such as,
+     * Creates a new click event object and adds it to the queue in order to
+     * speed up the redirect service
+     *
+     * @param url the URL entity that was created when the request was submitted
+     * @param clientType the client type that will be persisted
+     * @param geoResult the location information that will be persisted
+     */
+    @Async("taskExecutor")
+    public void enqueueClickEvent(Url url, ClientType clientType, GeoResult geoResult) {
+        ClickEvent clickEvent = new ClickEvent();
+
+        clickEvent.setUrl(url);
+        clickEvent.setTimestamp(LocalDateTime.now());
+        clickEvent.setClientType(clientType);
+        clickEvent.setCountryCode(geoResult.getCountryCode());
+        clickEvent.setLocationDetails(geoResult.getLocationDetails());
+
+        queue.add(clickEvent);
+    }
+
+    /**
+     * Scheduled flush that runs periodically and drains the queue.
+     */
+    @Scheduled(fixedRate = MAX_FLUSH_INTERVAL_MS)
+    @Async("taskExecutor")
+    @Transactional
+    public void flushBatchScheduled() {
+        List<ClickEvent> batch = new ArrayList<>();
+        ClickEvent clickEvent;
+        while ((clickEvent = queue.poll()) != null && batch.size() < MAX_BATCH_SIZE) {
+            batch.add(clickEvent);
+        }
+
+        if (!batch.isEmpty()) {
+            clickEventRepository.saveAll(batch);
+        }
+    }
+
+    /**
+     * Handles the collection of all required analytics for internal use such as,
      * short URL segment, time stamp, client type, country code and any extra location details
      *
      * @param url the URL entity that was created when the request was submitted
      * @param request the HTTP request
      */
     public void handleClickEvent(Url url, HttpServletRequest request) {
-        ClickEvent clickEvent = new ClickEvent();
 
-        clickEvent.setUrl(url);
-        clickEvent.setTimestamp(LocalDateTime.now());
-        clickEvent.setClientType(requestInfoUtil.getClient(request));
+        ClientType clientType = requestInfoUtil.getClient(request);
 
         GeoResult geoResult = requestInfoUtil.getGeoResult(request);
-        clickEvent.setCountryCode(geoResult.getCountryCode());
-        clickEvent.setLocationDetails(geoResult.getLocationDetails());
 
-        clickEventRepository.save(clickEvent);
+        enqueueClickEvent(url, clientType, geoResult);
     }
 
     public StatsResponseDto getStats(){

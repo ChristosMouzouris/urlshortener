@@ -44,7 +44,7 @@ export const CountryAnalyticsContainer = () => {
       ) : data && data.length > 0 ? (
         <ChartDisplay
           title=""
-          labels={data.map((b) => b.country)}
+          labels={data.map((b) => b.location)}
           data={data.map((b) => b.clicks)}
           defaultType="bar"
           allowToggle

@@ -6,6 +6,8 @@ import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.repository.UrlRepository;
 import io.github.christosmouzouris.urlshortener.util.HashidsUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,24 +37,30 @@ public class UrlService {
      * @param entity Url entity containing the original URL
      * @return the persisted URL entity with shortUrl set
      */
+    @Transactional
     public Url shortenUrl(Url entity) {
 
         // Check if long URL already exists and return shortUrl associated with it if yes
         Url existing = urlRepository.findByLongUrl(entity.getLongUrl()).orElse(null);
         if (existing != null) {
             existing.setLastAccessedDate(LocalDateTime.now());
-            return urlRepository.save(existing);
+            return existing;
         }
 
         entity.setCreationDate(LocalDateTime.now());
         entity.setLastAccessedDate(LocalDateTime.now());
 
-        urlRepository.save(entity);
+        try {
+            urlRepository.saveAndFlush(entity); // ensures ID is generated
+            entity.setShortUrl(hashidsUtil.encodeId(entity.getId()));
+        } catch (DataIntegrityViolationException e) {
+            existing = urlRepository.findByLongUrl(entity.getLongUrl())
+                    .orElseThrow(() -> new RuntimeException("Unexpected DB state"));
+            existing.setLastAccessedDate(LocalDateTime.now());
+            return existing;
+        }
 
-        String shortUrl = hashidsUtil.encodeId(entity.getId());
-        entity.setShortUrl(shortUrl);
-
-        return urlRepository.save(entity);
+        return entity;
     }
 
     /**
@@ -81,14 +89,13 @@ public class UrlService {
         Url url = urlRepository.findByShortUrl(shortUrl)
                 .orElseThrow(() -> new UrlNotFoundException(shortUrl));
 
-        LocalDateTime now = LocalDateTime.now();
-        int updated = urlRepository.updateLastAccessedDate(shortUrl, now);
-        if (updated == 0) {
-            throw new UrlUpdateFailedException(shortUrl);
-        }
-
-        url.setLastAccessedDate(now);
+        updateLastAccessedDate(shortUrl);
         return url;
+    }
+
+    @Async("taskExecutor")
+    public void updateLastAccessedDate(String shortUrl) {
+        urlRepository.updateLastAccessedDate(shortUrl, LocalDateTime.now());
     }
 
     public List<Url> getAllUrls() {

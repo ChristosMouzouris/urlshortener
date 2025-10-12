@@ -7,12 +7,19 @@ import java.util.Arrays;
  * Useful in classifying analytics
  */
 public enum ClientType {
+    BRAVE("brave"),
     CHROME("chrome"),
     FIREFOX("firefox"),
-    BRAVE("brave"),
     SAFARI("safari"),
     EDGE("edge"),
-    BOT("bot", "spider", "crawler"),
+    BOT(
+            "bot", "spider", "crawler", "crawl", "slurp", "fetch",
+            "python", "scrapy", "httpclient", "java", "curl", "wget",
+            "facebookexternalhit", "bingpreview", "google", "yandex", "baiduspider",
+            "duckduckbot", "sogou", "mj12bot", "ahrefsbot", "semrushbot",
+            "linkedinbot", "embedly", "pinterest", "bitlybot", "twitterbot",
+            "discordbot", "slackbot", "telegrambot"
+    ),
     UNKNOWN();
 
     private final String[] identifiers;

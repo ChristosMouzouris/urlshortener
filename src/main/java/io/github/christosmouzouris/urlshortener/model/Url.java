@@ -8,19 +8,28 @@ import java.time.LocalDateTime;
 @Table(
         name = "url",
         indexes = {
-                @Index(name = "idx_shortUrl", columnList = "shortUrl")
+                @Index(name = "idx_shortUrl", columnList = "shortUrl"),
+                @Index(name = "idx_longUrl", columnList = "longUrl")
         }
 )
 public class Url {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "url_seq_gen",
+            sequenceName = "url_seq",
+            allocationSize = 50
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "url_seq_gen"
+    )
     private Long id;
 
     @Column(nullable = true, unique = true)
     private String shortUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String longUrl;
 
     @Column(nullable = false)

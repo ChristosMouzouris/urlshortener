@@ -51,14 +51,14 @@ export const ChartDisplay: React.FC<ChartDisplayProps> = ({
         )}
       </div>
 
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={350}>
         {chartType === 'pie' ? (
           <PieChart>
             <Pie
               data={chartData}
               dataKey="value"
               nameKey="name"
-              outerRadius={100}
+              outerRadius={150}
               label
             >
               {chartData.map((_, i) => (

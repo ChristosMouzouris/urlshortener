@@ -49,10 +49,12 @@ public class AnalyticsService {
     }
 
     /**
+     * Creates a new click event object and adds it to the queue in order to
+     * speed up the redirect service
      *
-     * @param url
-     * @param clientType
-     * @param geoResult
+     * @param url the URL entity that was created when the request was submitted
+     * @param clientType the client type that will be persisted
+     * @param geoResult the location information that will be persisted
      */
     @Async("taskExecutor")
     public void enqueueClickEvent(Url url, ClientType clientType, GeoResult geoResult) {

@@ -2,6 +2,15 @@
 
 A production-style full-stack URL shortening service built with real-time analytics tracking for clicks, location, and client type.
 
+## Table of Contents
+- [Tech Stack](#tech-stack)
+- [Frontend](#frontend)
+- [Backend](#backend)
+- [Performance and Concurrency Highlights](#performance-and-concurrency-highlights)
+- [Functionality Testing](#functionality-testing)
+- [Performance Testing](#performance-testing)
+- [Demo](#demo)
+
 Features:
 - Shorten long URLs into short codes.
 - Redirect short URLs to their original destination.
@@ -72,7 +81,7 @@ Features:
 | GET    | `/{shortUrl}`        | Redirects to the original URL and tracks analytics.                   |
 | GET    | `/api/analytics/...` | Fetches aggregated click data for charts (e.g., by browser, country). |
 
-**Performance and Concurrency Highlights:**
+## Performance and Concurrency Highlights:
 - Indexed critical fields and custom queries optimise analytics retrieval.
 - Hikari connection pool tuned for high concurrency:
   - maximum-pool-size=50, minimum-idle=10
@@ -83,6 +92,20 @@ Features:
   - Ensures that redirects and other frontend-facing requests aren’t blocked by analytics processing.
 - @Transactional and atomic UPDATE ensure concurrency safety for lastAccessedDate updates without pessimistic locks.
 - Overall setup allows high throughput with minimal latency even under stress testing.
+
+---
+
+## Functionality Testing
+To ensure reliability and correctness of the URL Shortener service, comprehensive unit and integration tests were implemented for both backend and frontend components.
+
+**Backend Tests**
+- Unit Tests:
+  - JUnit + Mockito used to test individual services, repository methods and utility classes.
+  - Verified URL shortening, redirect logic, analytics tracking and exception handling.
+- Integration Tests:
+  - Spring Boot test slices to verify REST endpoints (/api/url, /{shortUrl}, /api/analytics/...) against an in-memory or Dockerised PostgreSQL instance.
+  - Confirmed correct database writes, transactional consistency, and concurrency-safe updates (e.g., lastAccessedDate and click events).
+- Coverage: Achieved ~70% coverage across services and repositories, including edge cases such as invalid URLs and concurrent requests.
 
 ---
 

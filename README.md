@@ -43,6 +43,8 @@ To validate the efficiency and concurrency safety of the URL Shortener service, 
 | Peak throughput          | **~2,400 requests per second**                      |
 | Database                 | All writes batched asynchronously with no data loss |
 
+![Performance Test](screenshots/performance_test_screenshot.png)
+
 **Interpretation**
 - The service consistently handled 2.4K requests per second with zero failed requests.
 - The 95th percentile latency maintained under 300ms, demonstraiting excellent responsivess under load.

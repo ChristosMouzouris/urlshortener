@@ -5,6 +5,7 @@ import io.github.christosmouzouris.urlshortener.dto.UrlResponseDto;
 import io.github.christosmouzouris.urlshortener.mapper.UrlMapper;
 import io.github.christosmouzouris.urlshortener.model.Url;
 import io.github.christosmouzouris.urlshortener.service.UrlService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class UrlController {
     }
 
     @PostMapping
-    public UrlResponseDto createShortUrl(@RequestBody UrlRequestDto urlRequestDto) {
+    public UrlResponseDto createShortUrl(@Valid @RequestBody UrlRequestDto urlRequestDto) {
         Url entity = urlMapper.toEntity(urlRequestDto);
         Url saved = urlService.shortenUrl(entity);
         return urlMapper.toResponseDto(saved);

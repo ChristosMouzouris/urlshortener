@@ -1,4 +1,4 @@
-import React, { type ReactNode, useState } from 'react';
+import React, { type ReactNode, useState, useCallback } from 'react';
 import Notification from './Notification';
 import { NotificationEnum } from '../types/notificationEnum';
 import { NotificationContext } from './NotificationContext';
@@ -16,18 +16,18 @@ interface ProviderProps {
 const NotificationProvider: React.FC<ProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
 
-  const addNotification = (
-    notificationText: string,
-    notificationType: NotificationEnum
-  ) => {
-    const id = crypto.randomUUID();
-    setNotifications((prev) => [
-      ...prev,
-      { id, notificationText, notificationType },
-    ]);
+  const addNotification = useCallback(
+    (notificationText: string, notificationType: NotificationEnum) => {
+      const id = crypto.randomUUID();
+      setNotifications((prev) => [
+        ...prev,
+        { id, notificationText, notificationType },
+      ]);
 
-    setTimeout(() => removeNotification(id), 5000);
-  };
+      setTimeout(() => removeNotification(id), 5000);
+    },
+    []
+  );
 
   const removeNotification = (id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));

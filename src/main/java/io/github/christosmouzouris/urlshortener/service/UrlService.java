@@ -95,7 +95,10 @@ public class UrlService {
 
     @Async("taskExecutor")
     public void updateLastAccessedDate(String shortUrl) {
-        urlRepository.updateLastAccessedDate(shortUrl, LocalDateTime.now());
+        int updatedRows = urlRepository.updateLastAccessedDate(shortUrl, LocalDateTime.now());
+        if (updatedRows == 0) {
+            throw new UrlUpdateFailedException(shortUrl);
+        }
     }
 
     public List<Url> getAllUrls() {

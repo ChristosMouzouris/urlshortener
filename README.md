@@ -152,3 +152,8 @@ Despite running on a constrained local setup, the system demonstrated strong sca
 ---
 
 ## DEMO
+**Large Screen Demo:**
+![Large Screen Demo](screenshots/project_demo_1.mp4)
+
+**Small Screen Demo:**
+![Small Screen Demo](screenshots/project_demo_2.mp4)

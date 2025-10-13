@@ -152,3 +152,10 @@ Despite running on a constrained local setup, the system demonstrated strong sca
 ---
 
 ## DEMO
+**Large Screen Demo:**
+
+[![Demo 1](https://img.youtube.com/vi/eZnXWmRHK7E/0.jpg)](https://www.youtube.com/watch?v=eZnXWmRHK7E)
+
+**Small Screen Demo:**
+
+[![Demo 2](https://img.youtube.com/vi/ikoNAglLqVI/0.jpg)](https://www.youtube.com/watch?v=ikoNAglLqVI)

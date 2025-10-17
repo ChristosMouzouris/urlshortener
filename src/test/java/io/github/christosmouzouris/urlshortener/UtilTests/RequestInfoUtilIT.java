@@ -23,7 +23,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class RequestInfoUtilIntegrationTest {
+public class RequestInfoUtilIT {
 
     @Autowired
     private RestTemplate restTemplate;

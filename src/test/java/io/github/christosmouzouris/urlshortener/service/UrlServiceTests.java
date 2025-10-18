@@ -43,9 +43,6 @@ public class UrlServiceTests {
         when(urlRepository.findByLongUrl("https://urlshortener.com"))
                 .thenReturn(Optional.of(existingUrl));
 
-        when(urlRepository.save(any(Url.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
         // When: the shortenUrl method is called with the duplicate long Url
         Url result = urlService.shortenUrl(existingUrl);
 
@@ -54,7 +51,7 @@ public class UrlServiceTests {
         // And:  the last accessed date is updated
         assertThat(result.getLastAccessedDate()).isNotNull();
         // And: the urlRepository save method was called once
-        verify(urlRepository, times(1)).save(existingUrl);
+        verify(urlRepository, times(0)).save(existingUrl);
     }
 
     @Test

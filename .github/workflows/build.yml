@@ -33,7 +33,7 @@ jobs:
           DEBUG: 'true'
 
       - name: Upload Surefire Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
           path: target/surefire-reports

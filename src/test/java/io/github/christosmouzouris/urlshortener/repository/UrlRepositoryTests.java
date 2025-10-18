@@ -97,7 +97,7 @@ public class UrlRepositoryTests {
 
         Url url2 = new Url();
         url2.setShortUrl("short2");
-        url2.setLongUrl("https://urlshortener.com");
+        url2.setLongUrl("https://urlshortener1.com");
         url2.setCreationDate(LocalDateTime.now());
         url2.setLastAccessedDate(LocalDateTime.now());
         urlRepository.save(url2);

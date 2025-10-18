@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: ['**']
   pull_request:
-    branches: [ main ]
+    branches: ['**']
 
 jobs:
   backend-tests:
@@ -20,6 +20,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Create .env for tests
+        run: |
+          echo "HASHIDS_SALT=ci_test_salt" >> .env
+          echo "HASHIDS_MIN_LENGTH=6" >> .env
+
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
 
@@ -33,6 +38,7 @@ jobs:
           DEBUG: 'true'
 
       - name: Upload Surefire Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports

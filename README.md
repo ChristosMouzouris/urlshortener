@@ -107,6 +107,13 @@ To ensure reliability and correctness of the URL Shortener service, comprehensiv
   - Confirmed correct database writes, transactional consistency, and concurrency-safe updates (e.g., lastAccessedDate and click events).
 - Coverage: Achieved ~70% coverage across services and repositories, including edge cases such as invalid URLs and concurrent requests.
 
+**API Tests**
+- Validated REST endpoints using Postman collections.
+
+
+**Continuous Integration (CI)**
+- Configured GitHub Actions to automatically build and run tests for the project, ensuring reliable integration and catching regressions early.
+
 ---
 
 ## Performance Testing

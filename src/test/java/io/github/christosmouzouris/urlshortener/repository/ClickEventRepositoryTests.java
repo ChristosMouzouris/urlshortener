@@ -16,7 +16,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ua_parser.Client;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -212,8 +211,10 @@ public class ClickEventRepositoryTests {
     public void shouldFindTopUrlsWhenFindingByTopUrls() {
         // Given: an existing Url in the repository
         Url url1 = createUrl("short");
+        url1.setLongUrl("long");
         Url savedUrl1 = urlRepository.save(url1);
         Url url2 = createUrl("short1");
+        url2.setLongUrl("long1");
         Url savedUrl2 = urlRepository.save(url2);
 
         // And: three existing click events in the repository

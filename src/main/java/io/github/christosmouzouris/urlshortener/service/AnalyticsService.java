@@ -218,4 +218,13 @@ public class AnalyticsService {
                 .map(date -> new ClicksTrendResponseDto(date, clicksByDate.getOrDefault(date, 0L)))
                 .toList();
     }
+
+    /**
+     * Package private getter for testing purposes
+     *
+     * @return the current queue
+     */
+    Queue<ClickEvent> getQueueForTest() {
+        return queue;
+    }
 }

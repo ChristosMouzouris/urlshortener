@@ -22,7 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ua_parser.Client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -53,6 +56,45 @@ public class AnalyticsServiceTests {
     private AnalyticsService analyticsService;
 
     @Test
+    public void shouldEnqueueClickEventCorrectly() {
+        // Given: a valid Url, ClientType, and GeoResult
+        Url url = createUrl();
+        ClientType clientType = ClientType.CHROME;
+        GeoResult geoResult = createGeoResult();
+
+        // When: the enqueueClickEvent method is called with the correct parameters
+        analyticsService.enqueueClickEvent(url, clientType, geoResult);
+
+        //Then: a ClickEvent is added to the queue with correct values
+        ClickEvent clickEvent = analyticsService.getQueueForTest().poll();
+
+        assertThat(clickEvent).isNotNull();
+        assertThat(clickEvent.getUrl()).isEqualTo(url);
+        assertThat(clickEvent.getTimestamp()).isNotNull();
+        assertThat(clickEvent.getClientType()).isEqualTo(ClientType.CHROME);
+        assertThat(clickEvent.getCountryCode()).isEqualTo("UK");
+    }
+
+    @Test
+    public void shouldFlushBatchToRepository() {
+        // Given: two ClickEvents added to the analytics service queue
+        ClickEvent clickEvent1 = new ClickEvent();
+        ClickEvent clickEvent2 = new ClickEvent();
+
+        analyticsService.getQueueForTest().add(clickEvent1);
+        analyticsService.getQueueForTest().add(clickEvent2);
+
+        // When: flushBatchScheduled is called to persist queued events
+        analyticsService.flushBatchScheduled();
+
+        // Then: the repository's saveAll method is called once with both ClickEvents
+        verify(clickEventRepository, times(1)).saveAll(argThat(iterable -> {
+            List<ClickEvent> list = StreamSupport.stream(iterable.spliterator(), false).toList();
+            return list.contains(clickEvent1) && list.contains(clickEvent2) && list.size() == 2;
+        }));
+    }
+
+    @Test
     public void shouldPersistClickEventWithNecessaryValues() {
         // Given: a Url object and an HTTP request
         Url url = createUrl();
@@ -63,21 +105,23 @@ public class AnalyticsServiceTests {
         when(requestInfoUtil.getGeoResult(any()))
                 .thenReturn(createGeoResult());
 
+        AnalyticsService spyService = Mockito.spy(analyticsService);
+
         // When: the handlClickEvent method is called with a url object and an http request
-        analyticsService.handleClickEvent(url, request);
+        spyService.handleClickEvent(url, request);
 
-        // Then: the constructed click event is persisted in the database
-        ArgumentCaptor<ClickEvent> captor = ArgumentCaptor.forClass(ClickEvent.class);
-        verify(clickEventRepository, times(1)).save(captor.capture());
+        ArgumentCaptor<Url> urlCaptor = ArgumentCaptor.forClass(Url.class);
+        ArgumentCaptor<ClientType> clientTypeCaptor = ArgumentCaptor.forClass(ClientType.class);
+        ArgumentCaptor<GeoResult> geoCaptor = ArgumentCaptor.forClass(GeoResult.class);
 
-        ClickEvent clickEvent = captor.getValue();
+        verify(spyService).enqueueClickEvent(urlCaptor.capture(),
+                clientTypeCaptor.capture(),
+                geoCaptor.capture());
 
-        // And: has the correct values in its fields
-        assertThat(clickEvent).isNotNull();
-        assertThat(clickEvent.getUrl()).isEqualTo(url);
-        assertThat(clickEvent.getTimestamp()).isNotNull();
-        assertThat(clickEvent.getClientType()).isEqualTo(ClientType.CHROME);
-        assertThat(clickEvent.getCountryCode()).isEqualTo("UK");
+        // Then: the objects passed to the enqueueClickEvent method should have the correct values
+        assertThat(urlCaptor.getValue()).isEqualTo(url);
+        assertThat(clientTypeCaptor.getValue()).isEqualTo(ClientType.CHROME);
+        assertThat(geoCaptor.getValue().getCountryCode()).isEqualTo("UK");
     }
 
     @Test
@@ -188,8 +232,8 @@ public class AnalyticsServiceTests {
         when(projection1.getLongUrl()).thenReturn("domain");
         TopUrlsProjection projection2 = mock(TopUrlsProjection.class);
         when(projection2.getCount()).thenReturn(10L);
-        when(projection1.getShortUrl()).thenReturn("short1");
-        when(projection1.getLongUrl()).thenReturn("domain1");
+        when(projection2.getShortUrl()).thenReturn("short1");
+        when(projection2.getLongUrl()).thenReturn("domain1");
 
         when(clickEventRepository.findTopUrls(2))
                 .thenReturn(List.of(projection1, projection2));

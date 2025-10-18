@@ -25,3 +25,6 @@ jobs:
 
       - name: Build and run tests
         run: ./mvnw clean verify -Dspring.profiles.active=test
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: 'true'
+          DEBUG: 'true'

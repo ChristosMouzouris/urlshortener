@@ -66,7 +66,7 @@ public class UrlServiceTests {
         when(hashIdsUtil.encodeId(2L))
                 .thenReturn("short");
 
-        when(urlRepository.save(any(Url.class)))
+        when(urlRepository.saveAndFlush(any(Url.class)))
                 .thenAnswer(invocation -> {
                     Url saved =  invocation.getArgument(0);
                     if (saved.getId() == null) {
@@ -85,7 +85,7 @@ public class UrlServiceTests {
         assertThat(result.getCreationDate()).isNotNull();
         assertThat(result.getLastAccessedDate()).isNotNull();
         // And: the urlRepository save method was called twice
-        verify(urlRepository, times(2)).save(any(Url.class));
+        verify(urlRepository, times(1)).saveAndFlush(any(Url.class));
     }
 
     @Test

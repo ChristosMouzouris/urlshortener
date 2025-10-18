@@ -23,7 +23,7 @@ class UrlshortenerApplicationTests {
             .withUsername("testuser")
             .withPassword("testpass")
             .withStartupTimeout(Duration.ofMinutes(2))
-            .waitingFor(Wait.forListeningPort());
+            .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\n", 1));
 
     @DynamicPropertySource
     static void configureDatasource(DynamicPropertyRegistry registry) {

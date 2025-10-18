@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -233,8 +232,8 @@ public class AnalyticsServiceTests {
         when(projection1.getLongUrl()).thenReturn("domain");
         TopUrlsProjection projection2 = mock(TopUrlsProjection.class);
         when(projection2.getCount()).thenReturn(10L);
-        when(projection1.getShortUrl()).thenReturn("short1");
-        when(projection1.getLongUrl()).thenReturn("domain1");
+        when(projection2.getShortUrl()).thenReturn("short1");
+        when(projection2.getLongUrl()).thenReturn("domain1");
 
         when(clickEventRepository.findTopUrls(2))
                 .thenReturn(List.of(projection1, projection2));

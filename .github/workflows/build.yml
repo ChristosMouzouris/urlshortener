@@ -31,3 +31,9 @@ jobs:
         env:
           TESTCONTAINERS_RYUK_DISABLED: 'true'
           DEBUG: 'true'
+
+      - name: Upload Surefire Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: surefire-reports
+          path: target/surefire-reports

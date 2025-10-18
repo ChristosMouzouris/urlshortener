@@ -20,6 +20,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Create .env for tests
+        run: |
+          echo "HASHIDS_SALT=ci_test_salt" >> .env
+          echo "HASHIDS_MIN_LENGTH=6" >> .env
+
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
 

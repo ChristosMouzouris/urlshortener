@@ -7,6 +7,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
+
 @SpringBootTest
 @Testcontainers
 class UrlshortenerApplicationTests {
@@ -16,7 +18,8 @@ class UrlshortenerApplicationTests {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
             .withDatabaseName("testdb")
             .withUsername("testuser")
-            .withPassword("testpass");
+            .withPassword("testpass")
+            .withStartupTimeout(Duration.ofMinutes(2));
 
     @Test
     void contextLoads() {
